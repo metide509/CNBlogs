@@ -26,4 +26,6 @@
 
 
     <color name="gray_light">#E3E3E3</color>
+
+    <color name="color_gray">#d81e06</color>
 </resources>

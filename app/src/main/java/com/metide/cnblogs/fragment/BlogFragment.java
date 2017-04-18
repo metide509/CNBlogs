@@ -191,7 +191,7 @@ public class BlogFragment extends Fragment implements Handler.Callback {
     protected void initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         setContentView(R.layout.fragment_blog);
 
-        mRecyclerView = (LRecyclerView) mContentView.findViewById(R.id.lrecycler_view_common);
+        mRecyclerView = (LRecyclerView) mContentView.findViewById(R.id.recycler_view_common);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);

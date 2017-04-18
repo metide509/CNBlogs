@@ -23,8 +23,8 @@
         android:layout_height="wrap_content"
         android:minHeight="?actionBarSize"
         android:layout_gravity="bottom"
-        app:bnbActiveColor="@color/colorPrimary"
-        app:bnbInactiveColor="#AAAAAA"
+        app:bnbActiveColor="#d81e06"
+        app:bnbInactiveColor="#333333"
         app:bnbBackgroundColor="@android:color/white"
         app:bnbBackgroundStyle="background_style_static"
         app:bnbMode="mode_fixed">

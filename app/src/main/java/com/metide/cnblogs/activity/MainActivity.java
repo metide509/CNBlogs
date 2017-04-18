@@ -7,11 +7,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.ashokvarma.bottomnavigation.BadgeItem;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.metide.cnblogs.R;
-import com.metide.cnblogs.bean.Blogger;
 import com.metide.cnblogs.fragment.BloggerFragment;
 import com.metide.cnblogs.fragment.DiscoveryFragment;
 import com.metide.cnblogs.fragment.HomeFragment;
