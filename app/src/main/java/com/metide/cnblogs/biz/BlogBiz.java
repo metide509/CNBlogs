@@ -4,6 +4,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
 
+import com.metide.cnblogs.db.BlogDB;
+import com.metide.cnblogs.db.SqliteHelper;
+import com.metide.cnblogs.utils.AppSchleher;
 import com.metide.cnblogs.utils.Logger;
 import com.metide.cnblogs.bean.Blog;
 import com.metide.cnblogs.bean.Blogger;
@@ -129,10 +132,8 @@ public class BlogBiz extends BaseBiz {
                             blog.authorLink = xmlPullParser.nextText();
                         } else if ("avatar".equals(tag) && blog != null) {
                             blog.authorImage = xmlPullParser.nextText();
-                            Logger.d(blog.authorImage);
                         }else if ("link".equals(tag) && blog != null) {
                             blog.link = xmlPullParser.getAttributeValue(1);
-                            Logger.d(blog.link);
                         } else if ("diggs".equals(tag) && blog != null) {
                             blog.recommendation = Integer.parseInt(xmlPullParser.nextText());
                         } else if ("views".equals(tag) && blog != null) {
@@ -144,6 +145,14 @@ public class BlogBiz extends BaseBiz {
                     case XmlPullParser.END_TAG:
                         if("entry".equals(tag)){
                             blogs.add(blog);
+                            final Blog temp = blog.clone();
+                            AppSchleher.io().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    BlogDB.save(temp);
+                                }
+                            });
+
                             blog = null;
                         }
                         break;

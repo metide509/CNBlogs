@@ -34,4 +34,5 @@ dependencies {
     compile 'in.srain.cube:ultra-ptr:1.0.11'
     testCompile 'junit:junit:4.12'
     compile 'com.github.jdsjlzx:LRecyclerView:1.4.1'
+    compile 'com.facebook.stetho:stetho:1.5.0'
 }

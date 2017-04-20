@@ -5,7 +5,6 @@ import android.util.ArrayMap;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.PrintWriter;
@@ -93,11 +92,6 @@ public class Logger {
     public static final String LOG_CRASH = "CRASH";
     public static final String LOG_SQL = "SQL";
 
-
-    private static ExecutorService sThreadPool =
-            Executors.newFixedThreadPool(10, Executors.defaultThreadFactory());
-
-
     /**
      * 默认时间格式
      */
@@ -109,14 +103,22 @@ public class Logger {
      */
     private static final int NOT_CONTAINS_LOG = -1;
 
-    private static int DEFAULT_THREAD_POOL_SIZE = 10;
+    /**
+     * 默认的线程数
+     */
+    private static int DEFAULT_THREAD_POOL_SIZE = 4;
+
+    /**
+     * 日志线程池
+     */
+    private static ExecutorService sThreadPool = Executors.newFixedThreadPool(
+            DEFAULT_THREAD_POOL_SIZE, Executors.defaultThreadFactory());
+
 
     static {
         sLogTempMap =
                 Collections.synchronizedMap(new ArrayMap<String, AbsLog>());
         add(LOG_CAT, LogCat.getInstance);
-        sThreadPool =
-                Executors.newFixedThreadPool(10, Executors.defaultThreadFactory());
     }
 
 
@@ -124,7 +126,7 @@ public class Logger {
      * 向日志记录器中添加日志组件
      *
      * @param name      日志名称，如果存在相同的，则覆盖，否则加入
-     * @param log       实现了ILog接口的日志组件
+     * @param log       实现了AbsLog的日志组件
      */
     public synchronized static void add(String name, AbsLog log){
         if(TextUtils.isEmpty(name)){
@@ -153,7 +155,7 @@ public class Logger {
     /**
      * 获取指定名称的日志组件
      * @param name  日志名称
-     * @return  实现了ILog接口的日志组件
+     * @return  实现了AbsLog的日志组件
      */
     public static AbsLog getLog(String name){
         if(TextUtils.isEmpty(name)){
@@ -161,7 +163,7 @@ public class Logger {
         }
 
         if(!sLogTempMap.containsKey(name)){
-            throw new IllegalArgumentException("参数错误：不包含名称为（" + name +"）的日志组件");
+            return null;
         }
 
         return sLogTempMap.get(name);
@@ -369,7 +371,10 @@ public class Logger {
     /**
      * 日志记录接口
      * 所有日志组件必须都要实现的接口
+     *
+     * ILog过时了，请实现抽象日志类AbsLog
      */
+    @Deprecated
     public interface ILog{
 
         /**
@@ -462,20 +467,54 @@ public class Logger {
                         "* [异常] %e\n" ;
 
 
+        /**
+         * 日志输出级别
+         *
+         * @return 日志级别，只有高于或等于此级别的日志才会输出
+         */
         protected abstract int getLevel();
 
+        /**
+         * VERBOSE 级别格式
+         * @return 默认为空，也就是原样输出日志
+         */
         protected String getVFormat(){ return ""; }
 
+        /**
+         * DEBUG 级别格式
+         * @return 默认为空，也就是原样输出日志
+         */
         protected String getDFormat(){ return ""; }
 
+        /**
+         * INFO 级别格式
+         * @return 默认为空，也就是原样输出日志
+         */
         protected String getIFormat(){ return ""; }
 
+        /**
+         * WARN 级别格式
+         * @return 默认为空，也就是原样输出日志
+         */
         protected String getWFormat(){ return ""; }
 
+        /**
+         * Error级别格式
+         * @return 默认为空，也就是原样输出日志
+         */
         protected String getEFormat(){ return ""; }
 
+        /**
+         * Assert级别格式
+         * @return 默认为空，也就是原样输出日志
+         */
         protected String getAFormat(){ return ""; }
 
+        /**
+         *  获取对应级别的内容格式
+         * @param level 日志级别
+         * @return 内容格式
+         */
         private String getFormat(int level){
             switch (level){
                 case VERBOSE:
@@ -494,12 +533,6 @@ public class Logger {
                     return DEFAULT_FORMAT;
             }
         }
-
-        /**
-         * 默认日志采用异步输出日志
-         */
-        protected boolean getAsync(){ return true;}
-
 
         void v(String tag, Throwable t, String message, Object... args) {
             prepareLog(VERBOSE,tag, t, message, args);
@@ -553,18 +586,14 @@ public class Logger {
 
                             //只有debug级别才会转换json格式
                             if(logLevel == DEBUG){
-                                try {
-                                    if (newMessage.startsWith("{")) {
-                                        JSONObject jsonObject = new JSONObject(newMessage);
-                                        newMessage = jsonObject.toString(2);
-                                        newMessage = "\n" + newMessage;
-                                    } else if (newMessage.startsWith("[")) {
-                                        JSONArray jsonArray = new JSONArray(newMessage);
-                                        newMessage = jsonArray.toString(2);
-                                        newMessage = "\n" + newMessage;
-                                    }
-                                } catch (JSONException e) {
-
+                                if (newMessage.startsWith("{")) {
+                                    JSONObject jsonObject = new JSONObject(newMessage);
+                                    newMessage = jsonObject.toString(2);
+                                    newMessage = "\n" + newMessage;
+                                } else if (newMessage.startsWith("[")) {
+                                    JSONArray jsonArray = new JSONArray(newMessage);
+                                    newMessage = jsonArray.toString(2);
+                                    newMessage = "\n" + newMessage;
                                 }
                             }
                         }
@@ -588,13 +617,29 @@ public class Logger {
 
                         log(curDate, logLevel, newTag, location, result, t);
                     }catch (Exception e){
-
+                        e.printStackTrace();
                     }
                 }
             });
 
         }
 
-        public abstract void log(Date date, int level, String tag, String location, String message, Throwable t);
+        /**
+         * 日志记录核心方法
+         *
+         *
+         * @param date 日志记录的时间
+         * @param level 日志级别
+         * @param tag 标签
+         * @param location 记录日志的位置
+         * @param message 内容
+         * @param t 异常
+         */
+        public abstract void log(Date date,
+                                 int level,
+                                 String tag,
+                                 String location,
+                                 String message,
+                                 Throwable t);
     }
 }

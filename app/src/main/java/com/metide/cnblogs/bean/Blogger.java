@@ -8,6 +8,7 @@ import java.io.Serializable;
  */
 
 public class Blogger implements Serializable {
+
     public String id;
     public String name;
     public String lastTime;
@@ -15,4 +16,6 @@ public class Blogger implements Serializable {
     public String blogName;
     public String headImage;
     public int postCount;
+
+    public String localHeadImage;
 }

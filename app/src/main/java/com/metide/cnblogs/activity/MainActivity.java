@@ -25,18 +25,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     private List<Fragment> mFragments;
     private String[] mNavNames;
     private int[] mActiveIcons = {
-            R.drawable.ic_home_active,
-            R.drawable.ic_blogger_active,
-            R.drawable.ic_news_active,
-            R.drawable.ic_discovery_active,
-            R.drawable.ic_my_active
+            R.drawable.ic_nav_home_avitve,
+            R.drawable.ic_nav_groups_active,
+            R.drawable.ic_nav_new_active,
+            R.drawable.ic_nav_discovery_active,
+            R.drawable.ic_nav_my_active
     };
     private int[] mInactiveIcons = {
-            R.drawable.ic_home_inactive,
-            R.drawable.ic_blogger_inactive,
-            R.drawable.ic_news_inactive,
-            R.drawable.ic_discovery_inactive,
-            R.drawable.ic_my_inactive
+            R.drawable.ic_nav_home_inactive,
+            R.drawable.ic_nav_groups_inactive,
+            R.drawable.ic_nav_new_inactive,
+            R.drawable.ic_nav_discovery_inactive,
+            R.drawable.ic_nav_my_inactive
     };
 
     @Override

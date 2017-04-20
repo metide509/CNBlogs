@@ -18,7 +18,6 @@
             android:id="@+id/blogger_head_image_64"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:src="@drawable/ic_me_32"
             android:layout_gravity="center"/>
 
         <TextView
