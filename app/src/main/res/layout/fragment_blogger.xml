@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.metide.cnblogs.fragment.BloggerFragment">
+    tools:context="com.metide.cnblogs.ui.fragment.BloggerFragment">
 
     <include layout="@layout/common_recycler_view"/>
 

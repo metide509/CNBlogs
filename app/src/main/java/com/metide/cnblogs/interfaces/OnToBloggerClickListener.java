@@ -1,8 +1,7 @@
 package com.metide.cnblogs.interfaces;
 
 import android.view.View;
-
-import com.metide.cnblogs.bean.Blogger;
+import com.metide.cnblogs.service.entity.BloggerResult;
 
 /**
  * Author   metide
@@ -10,5 +9,5 @@ import com.metide.cnblogs.bean.Blogger;
  */
 
 public interface OnToBloggerClickListener {
-    void toBlogger(View view, int position, Blogger blogger);
+    void toBlogger(View view, int position, BloggerResult.Blogger blogger);
 }

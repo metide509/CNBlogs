@@ -35,4 +35,21 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.github.jdsjlzx:LRecyclerView:1.4.1'
     compile 'com.facebook.stetho:stetho:1.5.0'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'com.squareup.retrofit2:retrofit:2.2.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
+
+    /**
+     * 直接写成 compile 'com.squareup.retrofit2:converter-simplexml:2.2.0'
+     * 会报错
+     *
+     * 见 http://blog.csdn.net/u013164293/article/details/53187494
+     */
+    //compile 'com.squareup.retrofit2:converter-simplexml:2.2.0'
+    compile ('com.squareup.retrofit2:converter-simplexml:2.0.0'){
+        exclude module: 'stax-api'
+        exclude module: 'stax'
+        exclude module: 'xpp3'
+    }
 }

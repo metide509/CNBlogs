@@ -5,7 +5,7 @@ import android.util.Log;
 import android.util.Xml;
 
 import com.metide.cnblogs.utils.Logger;
-import com.metide.cnblogs.bean.News;
+import com.metide.cnblogs.service.entity.News;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -34,7 +34,7 @@ public class NewsBiz extends BaseBiz{
     /**
      *
      *
-     <feed xmlns="http://www.w3.org/2005/Atom">
+     <BlogResult xmlns="http://www.w3.org/2005/Atom">
      <title type="text">博客园新闻频道</title>
      <id>uuid:908bf8f3-3792-4c95-abeb-f1a03df3a8a5;id=1787</id>
      <updated>2017-04-14T18:30:59Z</updated>
@@ -57,7 +57,7 @@ public class NewsBiz extends BaseBiz{
              </topicIcon>
          <sourceName>网易科技</sourceName>
      </entry>
-     </feed>
+     </BlogResult>
      *
      *
      * @param url

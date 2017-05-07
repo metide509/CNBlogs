@@ -8,8 +8,6 @@ import com.metide.cnblogs.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    protected static final int NOT_CONTENT_VIEW = -1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

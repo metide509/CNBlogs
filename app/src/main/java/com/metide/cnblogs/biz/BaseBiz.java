@@ -1,5 +1,7 @@
 package com.metide.cnblogs.biz;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -24,16 +26,15 @@ public class BaseBiz {
             connection.setConnectTimeout(5000);
 
             int code=connection.getResponseCode();
+            Log.d("code", code + "");
             if(code==200){
                 //获取服务器返回过来的结果
                 is=connection.getInputStream();
             }
-        } catch (MalformedURLException e) {
+        }catch (Exception e) {
             e.printStackTrace();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            return is;
         }
+
+        return is;
     }
 }
