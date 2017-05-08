@@ -76,7 +76,8 @@ public class SqliteHelper extends SQLiteOpenHelper {
                 "link text," +
                 "diggs integer," +
                 "views integer," +
-                "comments integer)";
+                "comments integer," +
+                "category integer)";
 
         db.execSQL(sql);
     }

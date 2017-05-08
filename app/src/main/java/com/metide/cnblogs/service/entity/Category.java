@@ -12,4 +12,7 @@ public class Category {
     public static final int NET_C_SHARP = 12040104;
     public static final int NET_CORE = 12040105;
     public static final int NET_WIN_FORM = 12040106;
+
+
+    public static final int SITE_HOME = 12000;
 }

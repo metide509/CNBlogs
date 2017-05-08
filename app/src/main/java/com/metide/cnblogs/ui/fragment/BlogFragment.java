@@ -22,6 +22,7 @@ import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
 import com.github.jdsjlzx.recyclerview.ProgressStyle;
 import com.metide.cnblogs.db.BlogDB;
 import com.metide.cnblogs.service.entity.BlogResult;
+import com.metide.cnblogs.service.entity.Category;
 import com.metide.cnblogs.service.manager.BlogManager;
 import com.metide.cnblogs.ui.adapter.BlogAdapter;
 import com.metide.cnblogs.ui.adapter.CommonAdapter;
@@ -42,9 +43,9 @@ import io.reactivex.functions.Function;
 
 
 public class BlogFragment extends Fragment
-        implements Handler.Callback,CommonAdapter.OnItemClickListener<BlogResult.Blog>,OnToWebListener {
+        implements CommonAdapter.OnItemClickListener<BlogResult.Blog>,OnToWebListener {
 
-    private static final String ARG_TYPE = "BLOG_TYPE";
+    public static final String ARG_TYPE = "BLOG_TYPE";
 
     private int mType;
 
@@ -58,8 +59,6 @@ public class BlogFragment extends Fragment
     private LRecyclerView mRecyclerView;
     private BlogAdapter mBlogAdapter;
     private LRecyclerViewAdapter mLRecyclerViewAdapter;
-
-    private Handler mHandler = new Handler(this);
 
     protected static final int FIRST_LOAD = 110;
     protected static final int LOAD_COMPLETED = 111;
@@ -138,7 +137,30 @@ public class BlogFragment extends Fragment
      * 懒加载一次。如果只想在对用户可见时才加载数据，并且只加载一次数据，在子类中重写该方法
      */
     protected void onLazyLoadOnce() {
-        mRecyclerView.forceToRefresh();
+        //mRecyclerView.forceToRefresh();
+        Observable.just(mType)
+                .map(new Function<Integer, List<BlogResult.Blog>>() {
+                    @Override
+                    public List<BlogResult.Blog> apply(@NonNull Integer integer) throws Exception {
+                        List<BlogResult.Blog> blogs = BlogDB.getBlogsByCategory(mType, 1, 10);
+                        if(blogs.size() == 0){
+                            loadData(mType);
+                        }
+                        return blogs;
+                    }
+                })
+                .flatMap(new Function<List<BlogResult.Blog>, ObservableSource<BlogResult.Blog>>() {
+                    @Override
+                    public ObservableSource<BlogResult.Blog> apply(@NonNull List<BlogResult.Blog> blogs) throws Exception {
+                        return Observable.fromIterable(blogs);
+                    }
+                })
+                .subscribe(new Consumer<BlogResult.Blog>() {
+                    @Override
+                    public void accept(@NonNull BlogResult.Blog blog) throws Exception {
+                        mBlogAdapter.addData(blog);
+                    }
+                });
     }
 
     /**
@@ -254,62 +276,27 @@ public class BlogFragment extends Fragment
                 .map(new Function<BlogResult, List<BlogResult.Blog>>() {
                     @Override
                     public List<BlogResult.Blog> apply(@NonNull BlogResult blogResult) throws Exception {
-                        Logger.d(Thread.currentThread().getName());
                         return blogResult.blogs;
                     }
                 })
-                .subscribeOn(AppSchedulers.io())
                 .map(new Function<List<BlogResult.Blog>, List<BlogResult.Blog>>() {
                     @Override
                     public List<BlogResult.Blog> apply(@NonNull List<BlogResult.Blog> blogs) throws Exception {
-                        mBlogAdapter.addDatas(blogs);
-                        mRecyclerView.refreshComplete(PAGE_SIZE);
-                        Logger.d(Thread.currentThread().getName());
+                        for (BlogResult.Blog blog : blogs){
+                            BlogDB.save(blog, mType);
+                        }
                         return blogs;
                     }
                 })
-                .subscribeOn(AppSchedulers.main())
-                .flatMap(new Function<List<BlogResult.Blog>, ObservableSource<BlogResult.Blog>>() {
+                .subscribeOn(AppSchedulers.io())
+                .observeOn(AppSchedulers.main())
+                .subscribe(new Consumer<List<BlogResult.Blog>>() {
                     @Override
-                    public ObservableSource<BlogResult.Blog> apply(@NonNull List<BlogResult.Blog> blogs) throws Exception {
-                        Logger.d(Thread.currentThread().getName());
-                        return Observable.fromIterable(blogs);
-                    }
-                })
-                .observeOn(AppSchedulers.io())
-                .subscribe(new Consumer<BlogResult.Blog>() {
-                    @Override
-                    public void accept(@NonNull BlogResult.Blog blog) throws Exception {
-                        Logger.d(Thread.currentThread().getName());
-                        BlogDB.save(blog);
+                    public void accept(@NonNull List<BlogResult.Blog> blogs) throws Exception {
+                        mBlogAdapter.addDatas(blogs);
+                        mRecyclerView.refreshComplete(PAGE_SIZE);
                     }
                 });
-    }
-
-    @Override
-    public boolean handleMessage(Message msg) {
-
-        if(msg.what == FIRST_LOAD){
-            mBlogAdapter.setDatas((List<BlogResult.Blog>)msg.obj);
-            mNewPageNumber = mNewPageNumber + 1;
-            mRecyclerView.refreshComplete(PAGE_SIZE);
-            mLRecyclerViewAdapter.notifyDataSetChanged();
-        }else if(msg.what == REFRESH_COMPLETED){
-
-            mBlogAdapter.addDatas((List<BlogResult.Blog>) msg.obj);
-            mNewPageNumber = mNewPageNumber + 1;
-            mRecyclerView.refreshComplete(PAGE_SIZE);
-            mLRecyclerViewAdapter.notifyDataSetChanged();
-
-        }else if(msg.what == LOAD_COMPLETED){
-
-            mBlogAdapter.addDatas((List<BlogResult.Blog>) msg.obj);
-            mNewPageNumber = mNewPageNumber + 1;
-            mRecyclerView.refreshComplete(PAGE_SIZE);
-
-        }
-
-        return true;
     }
 
     @Override
